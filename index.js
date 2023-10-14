@@ -19,7 +19,7 @@ const main = async function () {
   await getPages();
   console.log(`${rows.length} pages retrieved`)
   console.log('Starting BigQuery work')
-  // await insertInBigQuery();
+  await insertInBigQuery();
 }
 
 // Get all users from notion to be able to add username to the report
@@ -29,14 +29,35 @@ const getUsers = async function () {
 };
 
 const getPages = async function () {
+  let retrievedResults = [];
+  let has_more = true;
+  let next_cursor = null;
+  const searchConfig = {
+    sort: {
+      direction: 'ascending',
+      timestamp: 'last_edited_time'
+    },
+  }
+
+  while (has_more) {
+    if (next_cursor) { searchConfig.start_cursor = next_cursor}
+    let response = await notion.search(searchConfig);
+    retrievedResults = retrievedResults.concat(response.results);
+    if (response.next_cursor) {
+      next_cursor = response.next_cursor;
+    } else {
+      has_more = false;
+    }
+  }
   const response = await notion.search({
     sort: {
       direction: 'ascending',
       timestamp: 'last_edited_time'
     },
   });
-  const results = response.results;
-  results.forEach((result) => {
+
+
+  retrievedResults.forEach((result) => {
     if (result.properties.Verification && result.properties.Verification.verification.state) {
 
       const props = [];
