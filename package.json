@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "@google-cloud/bigquery": "^7.3.0",
     "@notionhq/client": "^2.2.13",
