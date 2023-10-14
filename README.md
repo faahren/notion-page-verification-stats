@@ -3,6 +3,7 @@ A small project including code to retrieve notion pages with their verification 
 
 
 ## How to install
+* Install dependencies
 * Create your env file:  `cp .env_template .env`
 * Add your API key and BQ information to your newly created env file. **Don't use an existing table as the script will overwrite it.**
 * Start with `yarn start` (or `npm start`)...
