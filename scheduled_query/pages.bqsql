@@ -1,0 +1,71 @@
+with import as (
+    select
+        PARSE_DATETIME(
+                '%Y-%m-%dT%H:%M:%E3SZ', created_time
+                ) as created_time,
+        PARSE_DATETIME(
+                '%Y-%m-%dT%H:%M:%E3SZ', last_edited_time
+                ) as last_edited_time,
+        url,
+        properties
+    from project.dataset.PUT_YOUR_TABLE_NAME_HERE
+),
+
+extr as (
+    select
+        created_time,
+        last_edited_time,
+        url,
+        (
+            select pp
+            from UNNEST(properties) as pp
+            where JSON_VALUE(pp, '$.name') = 'Verification'
+        ) as verification,
+        JSON_EXTRACT_ARRAY((
+            select pp
+            from UNNEST(properties) as pp
+            where JSON_VALUE(pp, '$.name') = 'Owner'
+        ), '$.value.people') as owners
+    from import
+),
+
+format as (
+    select
+        created_time,
+        last_edited_time,
+        url,
+        JSON_VALUE(verification, '$.value.verification.state') as status,
+        DATE(
+            PARSE_DATETIME(
+                '%Y-%m-%dT%H:%M:%E3SZ',
+                JSON_VALUE(verification, '$.value.verification.date.start')
+            )
+        )
+            as verification_done_on,
+        DATE(
+            PARSE_DATETIME(
+                '%Y-%m-%dT%H:%M:%E3SZ',
+                JSON_VALUE(verification, '$.value.verification.date.end')
+            )
+        )
+            as verification_ends_on,
+        JSON_VALUE(verification, '$.value.verification.verified_by.name')
+            as verified_by,
+        (
+            select STRING_AGG(JSON_VALUE(o, '$.name'), ',')
+            from UNNEST(owners) as o
+        ) as owners
+    from extr
+),
+
+calculations as (
+    select
+        *,
+        DATE_DIFF(CURRENT_DATE(), verification_done_on, day)
+            as days_since_verification,
+        DATE_DIFF(verification_ends_on, CURRENT_DATE(), day)
+            as days_to_verification_end
+    from format
+)
+
+select * from calculations;

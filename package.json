@@ -1,0 +1,11 @@
+{
+  "name": "notion",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@google-cloud/bigquery": "^7.3.0",
+    "@notionhq/client": "^2.2.13",
+    "dotenv": "^16.3.1"
+  }
+}
