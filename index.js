@@ -6,27 +6,17 @@ dotenv.config();
 const notion = new Client({ auth: process.env.API_KEY });
 const bigquery = new BigQuery({projectId: process.env.BIGQUERY_PROJECT});
 
-let users;
 const rows = [];
 
 
 const main = async function () {
   console.log('Starting to read data from Notion');
-  console.log('Retrieving users')
-  await getUsers();
-  console.log(`${users.length} users retrieved`)
   console.log('Retrieving pages')
   await getPages();
   console.log(`${rows.length} pages retrieved`)
   console.log('Starting BigQuery work')
   await insertInBigQuery();
 }
-
-// Get all users from notion to be able to add username to the report
-const getUsers = async function () {
-  const response = await notion.users.list();
-  users = response.results;
-};
 
 const getPages = async function () {
   let retrievedResults = [];
