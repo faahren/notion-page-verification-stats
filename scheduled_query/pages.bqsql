@@ -8,7 +8,7 @@ with import as (
                 ) as last_edited_time,
         url,
         properties
-    from project.dataset.PUT_YOUR_TABLE_NAME_HERE
+    from project.dataset.pages
 ),
 
 extr as (
